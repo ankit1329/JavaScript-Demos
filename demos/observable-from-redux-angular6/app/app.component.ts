@@ -24,159 +24,61 @@ import { MessageBusService } from "./message-bus";
 	styleUrls: [ "./app.component.less" ],
 	template:
 	`
-		<button (click)="sendMessages()">
-			Send Messages ( view in Console )
-		</button>
-
-		<button (click)="subscribeToMessages()">
-			Subscribe To Messages
-		</button>
-
-		<button (click)="unsubscribeFromMessages()">
-			Unsubscribe From Messages
-		</button>
+		test
 	`
 })
 export class AppComponent {
 
-	private messageBusGroup: MessageBusGroup;
-
 	// I initialize the app component.
-	constructor( demoStore: DemoStore, messageBus: MessageBusService ) {
+	constructor( demoStore: DemoStore ) {
 
-		// Let's create a GROUP for this message bus. The GROUP keeps track of all the
-		// subscriptions that we make within this context. As such, it allows us to
-		// unsubscribe from all the events with a single method.
-		this.messageBusGroup = messageBus.group();
-
-
-		demoStore.getStateAsStream().subscribe(
-			( demoState ) => {
-
-				console.log( "State:", demoState );
-
-			}
-		);
-
-		demoStore.select( "messages" ).subscribe(
-			( messages ) => {
-
-				console.log( "Messages:", messages );
-
+		var s = demoStore.getStateAsStream().subscribe(
+			( state ) => {
+				console.log( "Initial state", state );
 			}
 		);
 
 		demoStore.dispatch( new ActionTypeA({ foo: "foopa" }) );
-		demoStore.dispatch( new ActionTypeB({ bar: "barbra" }) );
-		demoStore.dispatch( new ActionTypeB({ bar: "barbra" }) );
-		demoStore.dispatch( new ActionTypeB({ bar: "barbra" }) );
-		demoStore.dispatch( new ActionTypeB({ bar: "barbra" }) );
-		demoStore.dispatch( new ActionTypeB({ bar: "barbra" }) );
 
-	}
+		s.unsubscribe();
 
-	// ---
-	// PUBLIC METHODS.
-	// ---
+		setTimeout(
+			() => {
 
-	// I put several messages onto the message bus.
-	public sendMessages() : void {
+				console.log( "--------" )
 
-		// NOTE: Since the message bus is SYNCHRONOUS, we know that any thing logged
-		// during the .emit() calls will be logged inside of our grouping.
-		console.group( "Events" );
-		this.messageBusGroup.emit( new EventTypeA({ foo: "foo" }) );
-		this.messageBusGroup.emit( new EventTypeB({ bar: "bar" }) );
-		this.messageBusGroup.emit( new EventTypeC({ baz: "bazzzy" }) );
-		this.messageBusGroup.emit( new EventTypeD() );
-		console.groupEnd();
+				var s2 = demoStore.getStateAsStream().subscribe(
+					( state ) => {
+						console.log( "Subsequent state", state );
+					}
+				);
 
-	}
+				demoStore.dispatch( new ActionTypeA({ foo: "banana" }) );
 
+				s2.unsubscribe();
 
-	// I subscribe to events on the message bus.
-	public subscribeToMessages() {
+				demoStore.dispatch( new ActionTypeA({ foo: "hammock" }) );
 
-		console.warn( "Subscribed to events!" );
-
-		// Subscribe to all events on the message bus.
-		this.messageBusGroup.subscribe(
-			( event: EventTypes ) : void => {
-
-				// Try navigating the discriminating union using the [type] property.
-				switch ( event.type ) {
-					case EventTypeA.type:
-
-						console.log( "Event-A happened [type]:", event.payload.foo );
-
-					break;
-					case EventTypeB.type:
-
-						console.log( "Event-B happened [type]:", event.payload.bar );
-
-					break;
-					case EventTypeD.type:
-
-						console.log( "Event-D happened [type]: (no payload)" );
-
-					break;
-				}
-
-				// Try navigating the discriminating union using the instance type.
-				if ( event instanceof EventTypeA ) {
-
-					console.log( "Event-A happened [instanceof]:", event.payload.foo );
-
-				} else if ( event instanceof EventTypeB ) {
-
-					console.log( "Event-B happened [instanceof]:", event.payload.bar );
-
-				}
-
-			}
+			},
+			1000
 		);
 
-		// Subscribe to a specific event. Since we know our callback will only be
-		// invoked for a specific event type, there will be automatic type inference
-		// and we don't have to explicitly type the event arguments (magic!).
-		this.messageBusGroup.on(
-			EventTypeC,
-			( event ) : void => {
 
-				console.log( "Event-C happened [on]:", event.payload.baz );
 
-			}
+		setTimeout(
+			() => {
+
+				console.log( "--------" )
+
+				var s3 = demoStore.getStateAsStream().subscribe(
+					( state ) => {
+						console.log( "S3 state", state );
+					}
+				);
+
+			},
+			2000
 		);
-
-		// Subscribe to a specific of event, but execute the callback in the given
-		// context.
-		// --
-		// CAUTION: This won't have automatic type inference (as above) since the class
-		// method can be called by anything (not just the message bus). As such, no
-		// implicit type guarantee can be made by the compiler.
-		this.messageBusGroup.on( EventTypeC, this.handleC, this );
-
-	}
-
-
-	// I unsubscribe from all of the events being tracked by the group.
-	public unsubscribeFromMessages() {
-
-		console.warn( "Unsubscribed from events!" );
-		// NOTE: Because we are using a message bus GROUP, this will automatically 
-		// unsubscribe from all of the events that this component is listening to.
-		this.messageBusGroup.unsubscribe();
-
-	}
-
-	// ---
-	// PRIVATE METHODS.
-	// ---
-
-	// I'm just here to demonstrate the .on( Type, callback, CONTEXT ) signature.
-	private handleC( event: EventTypeC ) : void {
-
-		console.log( "Event-C happened [on(this)]:", event.payload.baz, ( this instanceof AppComponent ) );
 
 	}
 

@@ -3,9 +3,35 @@
 import { Injectable } from "@angular/core";
 
 // Import the application components and services.
-import { AbstractAction } from "./abstract.store";
-import { AbstractActionWithPayload } from "./abstract.store";
 import { AbstractStore } from "./abstract.store";
+
+// ----------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------- //
+
+// I am a utility base-class for all of the actions that this will be dispatched on
+// the abstract store. The only guarantee that this class makes is a read-only Type.
+abstract class AbstractAction {
+
+	public readonly type: string;
+
+}
+
+
+// I am a utility sub-class / base-class for all of the payload-heavy actions that
+// will be dispatched on the abstract store. This class guarantees a payload with a
+// given interface.
+abstract class AbstractActionWithPayload<T> extends AbstractAction {
+
+	public readonly payload: T;
+
+	constructor( payload: T ) {
+	
+		super();
+		this.payload = payload;
+
+	}
+
+}
 
 // ----------------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------------- //
@@ -64,25 +90,25 @@ export class DemoStore extends AbstractStore<DemoState, ActionTypes> {
 
 		switch ( action.type ) {
 			case ActionTypeA.type:
+				console.log( ".... A", action );
 				return({
 					messages: this.reduceMessages( state.messages, action )
 				});
 			break;
 			default:
+				console.log( ".... default" );
 				return( state );
 			break;
 		}
 
 	}
 
-	private reduceMessages( messages: Message[], action: ActionTypes ) : Message[] {
-
-		return([
-			{
-				id: "1",
-				text: "cool thing"
-			}
-		]);
+	private reduceMessages( messages: Message[], action: ActionTypeA ) : Message[] {
+		
+		return messages.concat({
+			id: Date.now().toString(),
+			text: action.payload.foo
+		});
 
 	}
 
