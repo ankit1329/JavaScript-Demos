@@ -32,53 +32,23 @@ export class AppComponent {
 	// I initialize the app component.
 	constructor( demoStore: DemoStore ) {
 
-		var s = demoStore.getStateAsStream().subscribe(
-			( state ) => {
-				console.log( "Initial state", state );
+		// demoStore.dispatch( new ActionTypeA({ foo: "A" }) );
+		// demoStore.dispatch( new ActionTypeA({ foo: "B" }) );
+
+		var s = demoStore.select( "messages" ).subscribe(
+			(m) => {
+				console.log( "Messages", m.length, m );
 			}
 		);
 
-		demoStore.dispatch( new ActionTypeA({ foo: "foopa" }) );
 
-		s.unsubscribe();
+		// s.unsubscribe();
 
-		setTimeout(
-			() => {
-
-				console.log( "--------" )
-
-				var s2 = demoStore.getStateAsStream().subscribe(
-					( state ) => {
-						console.log( "Subsequent state", state );
-					}
-				);
-
-				demoStore.dispatch( new ActionTypeA({ foo: "banana" }) );
-
-				s2.unsubscribe();
-
-				demoStore.dispatch( new ActionTypeA({ foo: "hammock" }) );
-
-			},
-			1000
-		);
-
-
-
-		setTimeout(
-			() => {
-
-				console.log( "--------" )
-
-				var s3 = demoStore.getStateAsStream().subscribe(
-					( state ) => {
-						console.log( "S3 state", state );
-					}
-				);
-
-			},
-			2000
-		);
+		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
+		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
+		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
+		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
+		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
 
 	}
 
