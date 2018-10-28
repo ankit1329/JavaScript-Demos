@@ -7,15 +7,6 @@ import { ActionTypeA } from "./demo.store";
 import { ActionTypeB } from "./demo.store";
 import { DemoStore } from "./demo.store";
 
-
-import { EventTypeA } from "./message-bus-events";
-import { EventTypeB } from "./message-bus-events";
-import { EventTypeC } from "./message-bus-events";
-import { EventTypeD } from "./message-bus-events";
-import { EventTypes } from "./message-bus-events";
-import { MessageBusGroup } from "./message-bus";
-import { MessageBusService } from "./message-bus";
-
 // ----------------------------------------------------------------------------------- //
 // ----------------------------------------------------------------------------------- //
 
@@ -32,23 +23,18 @@ export class AppComponent {
 	// I initialize the app component.
 	constructor( demoStore: DemoStore ) {
 
-		// demoStore.dispatch( new ActionTypeA({ foo: "A" }) );
-		// demoStore.dispatch( new ActionTypeA({ foo: "B" }) );
+		demoStore.dispatch( new ActionTypeA({ foo: "A" }) );
+		demoStore.dispatch( new ActionTypeA({ foo: "B" }) );
+		demoStore.dispatch( new ActionTypeA({ foo: "C" }) );
 
-		var s = demoStore.select( "messages" ).subscribe(
-			(m) => {
-				console.log( "Messages", m.length, m );
+
+//		console.log( demoStore.getStateSnapshot() );
+
+		demoStore.getState().subscribe(
+			( state ) => {
+				console.log( "STATE:", state );
 			}
 		);
-
-
-		// s.unsubscribe();
-
-		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
-		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
-		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
-		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
-		// demoStore.dispatch( new ActionTypeB({ bar: "blamo" }) );
 
 	}
 

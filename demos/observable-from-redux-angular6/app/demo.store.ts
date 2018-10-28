@@ -89,7 +89,7 @@ export class DemoStore extends AbstractStore<DemoState, ActionTypes> {
 	}
 
 	protected reduce( state: DemoState, action: ActionTypes ) : DemoState {
-console.log( "reducer.", action.payload );
+
 		switch ( action.type ) {
 			case ActionTypeA.type:
 
@@ -100,7 +100,6 @@ console.log( "reducer.", action.payload );
 			break;
 			default:
 		
-				console.log( ".... default" );
 				return( state );
 		
 			break;
